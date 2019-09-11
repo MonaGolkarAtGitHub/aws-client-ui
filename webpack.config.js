@@ -8,13 +8,22 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.jsx?$/,
+                test: /\.(js|jsx)?$/,
+                exclude: /node_modules/,
                 loader: 'babel-loader'
+            },
+            {
+                test: /\.html?$/,
+                loader: 'html-loader',
+                options: {
+                    minimize: true
+                }
             }
         ]
     },
     plugins: [new HtmlWebpackPlugin({
-        template: './src/index.html'
+        template: './src/index.html',
+        filename: './index.html'
     })],
     devServer: {
         historyApiFallback: true
