@@ -23,9 +23,10 @@ class App extends React.Component {
         return (
             <div className="jumbotron">
                 <div className="container">
-                    <div className="col-sm-8 col-sm-offset-2">
                         {alert.message &&
-                            <div className={`alert ${alert.type}`}>{alert.message}</div>
+                            <div className="col-sm-8 col-sm-offset-2">
+                                <div className={`alert ${alert.type}`}>{alert.message}</div>
+                            </div>
                         }
                         <Router history={history}>
                             <div>
@@ -33,7 +34,6 @@ class App extends React.Component {
                                 <Route path="/login" component={LoginPage} />
                             </div>
                         </Router>
-                    </div>
                 </div>
             </div>
         );

@@ -12,8 +12,8 @@ class LoginPage extends React.Component {
         this.props.logout();
 
         this.state = {
-            username: '',
-            password: '',
+            accessKey: '',
+            secret: '',
             submitted: false
         };
 
@@ -30,31 +30,31 @@ class LoginPage extends React.Component {
         e.preventDefault();
 
         this.setState({ submitted: true });
-        const { username, password } = this.state;
-        if (username && password) {
-            this.props.login(username, password);
+        const { accessKey, secret } = this.state;
+        if (accessKey && secret) {
+            this.props.login(accessKey, secret);
         }
     }
 
     render() {
         const { loggingIn } = this.props;
-        const { username, password, submitted } = this.state;
+        const { accessKey, secret, submitted } = this.state;
         return (
-            <div className="col-md-6 col-md-offset-3">
+            <div className="col-md-4 offset-md-3">
                 <h2>Login</h2>
                 <form name="form" onSubmit={this.handleSubmit}>
-                    <div className={'form-group' + (submitted && !username ? ' has-error' : '')}>
-                        <label htmlFor="username">Username</label>
-                        <input type="text" className="form-control" name="username" value={username} onChange={this.handleChange} />
-                        {submitted && !username &&
-                            <div className="help-block">Username is required</div>
+                    <div className={'form-group' + (submitted && !accessKey ? ' has-error' : '')}>
+                        <label htmlFor="accessKey">Access Key ID</label>
+                        <input type="text" className="form-control" name="accessKey" value={accessKey} onChange={this.handleChange} />
+                        {submitted && !accessKey &&
+                            <div className="help-block">Access Key ID is required</div>
                         }
                     </div>
-                    <div className={'form-group' + (submitted && !password ? ' has-error' : '')}>
-                        <label htmlFor="password">Password</label>
-                        <input type="password" className="form-control" name="password" value={password} onChange={this.handleChange} />
-                        {submitted && !password &&
-                            <div className="help-block">Password is required</div>
+                    <div className={'form-group' + (submitted && !secret ? ' has-error' : '')}>
+                        <label htmlFor="secret">Secret Access Key</label>
+                        <input type="password" className="form-control" name="secret" value={secret} onChange={this.handleChange} />
+                        {submitted && !secret &&
+                            <div className="help-block">Secret Access Key is required</div>
                         }
                     </div>
                     <div className="form-group">

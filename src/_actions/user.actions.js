@@ -8,17 +8,21 @@ export const userActions = {
     logout
 };
 
-function login(username, password) {
+function login(accessKey, secret) {
     return dispatch => {
-        dispatch(request({ username }));
+        dispatch(request({ accessKey }));
 
-        userService.login(username, password)
+        userService.login(accessKey, secret)
             .then(
                 user => {
+                    // store user details and jwt token in local storage to keep user logged in between page refreshes
+                    localStorage.setItem('user', JSON.stringify(user));
                     dispatch(success(user));
                     history.push('/');
+                    userService.getUserAccessibleServices(user);
                 },
                 error => {
+                    console.log(error.toString())
                     dispatch(failure(error.toString()));
                     dispatch(alertActions.error(error.toString()));
                 }
