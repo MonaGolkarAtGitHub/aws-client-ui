@@ -22,7 +22,6 @@ function login(accessKey, secret) {
                 history.push('/');
             },
             error => {
-                console.log(error.toString())
                 dispatch(failure(error.toString()));
                 dispatch(alertActions.error(error.toString()));
             }
@@ -50,7 +49,6 @@ function getAccessibleServices(user) {
                 dispatch(success(accessibleServices));
             },
             error => {
-                console.log(error.toString())
                 dispatch(failure(error.toString()));
                 dispatch(alertActions.error(error.toString()));
             }

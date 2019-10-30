@@ -19,7 +19,6 @@ function getDynamodbTablesList() {
                 dispatch(success(tableNames));
             },
             error => {
-                console.log(error.toString())
                 dispatch(failure(error.toString()));
                 dispatch(alertActions.error(error.toString()));
             }
@@ -42,7 +41,6 @@ function getDynamodbTableDetails(tableName) {
                 dispatch(success(tableDetails, tableColumns));
             },
             error => {
-                console.log(error.toString())
                 dispatch(failure(error.toString()));
                 dispatch(alertActions.error(error.toString()));
             }
@@ -61,38 +59,9 @@ function getDynamodbTableRecords(tableName) {
         var headersSet = [];
         var recordsSet = [];
         var formattedRecordsSet = [];
-        // console.log("getDynamodbTableRecords calling getDynamodbTableRecordsRecursive");
-        // var data = await awsAccessService.getDynamodbTableRecordsRecursive(tableName) || {Items:[]};
-        // if (data.Items.length > 0){
-        //     data.Items.map(record => {
-        //         headersSet = headersSet.concat((Object.keys(record)).filter(x => !headersSet.includes(x)));
-        //         recordsSet.push(record);
-        //     });
-
-        //     recordsSet.map(record => {
-        //         let formattedRecord = [];
-        //         headersSet.map(column => {
-        //             formattedRecord.push(record[column] === undefined ? '' : record[column]);
-        //         });
-
-        //         formattedRecordsSet.push(formattedRecord);
-        //     });
-
-        //     console.log(headersSet)
-        //     console.log(recordsSet)
-        //     console.log(formattedRecordsSet)
-        //     dispatch(success(formattedRecordsSet, headersSet));
-        // } else {
-        //     console.log("No Records Found!")
-        //     dispatch(failure("No Records Found!"));
-        //     dispatch(alertActions.error("No Records Found!"));
-        // }
         awsAccessService.getDynamodbTableRecords(tableName)
-        // awsAccessService.getDynamodbTableRecordsRecursive(tableName)
         .then(
             data => {
-                console.log(data);
-
                 data.Items.map(record => {
                     headersSet = headersSet.concat((Object.keys(record)).filter(x => !headersSet.includes(x)));
                     recordsSet.push(record);
@@ -107,13 +76,9 @@ function getDynamodbTableRecords(tableName) {
                     formattedRecordsSet.push(formattedRecord);
                 });
 
-                console.log(headersSet)
-                console.log(recordsSet)
-                console.log(formattedRecordsSet)
                 dispatch(success(formattedRecordsSet, headersSet));
             },
             error => {
-                console.log(error.toString())
                 dispatch(failure(error.toString()));
                 dispatch(alertActions.error(error.toString()));
             }
@@ -124,17 +89,3 @@ function getDynamodbTableRecords(tableName) {
     function success(tableRecords, tableColumns) { return { type: awsConstants.DYNAMODB_TABLE_EXPORT_SUCCESS, tableRecords, tableColumns } }
     function failure(error) { return { type: awsConstants.DYNAMODB_TABLE_EXPORT_FAILURE, errors: error } }
 }
-
-// function getDynamodbTableRecordBatches(tableName ) {
-//     awsAccessService.getDynamodbTableRecords(tableName)
-//     .then(
-//         tableDetails => {
-//             dispatch(success(tableDetails));
-//         },
-//         error => {
-//             console.log(error.toString())
-//             dispatch(failure(error.toString()));
-//             dispatch(alertActions.error(error.toString()));
-//         }
-//     );
-// }

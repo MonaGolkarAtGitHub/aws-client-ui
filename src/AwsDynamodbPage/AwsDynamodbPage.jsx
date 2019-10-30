@@ -78,7 +78,6 @@ class AwsDynamodbPage extends React.Component {
 
         if (tableRecords) {
             let csvData = [tableColumns].concat(tableRecords);
-            //console.log(csvData);
             return (
                 <div className='d-flex justify-content-between w-100'>
                     <Button color='secondary' onClick={() => this.props.getDynamodbTableRecords(selectedTable)}>Export Data Again</Button>

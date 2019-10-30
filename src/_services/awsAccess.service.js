@@ -12,7 +12,6 @@ export const awsAccessService = {
     getDynamodbTablesList,
     getDynamodbTableDetails,
     getDynamodbTableRecords,
-  //  getDynamodbTableRecordsRecursive,
     getConstantsForAwsService,
     checkGlobalCredential
 };
@@ -32,11 +31,6 @@ function authenticateIamUser() {
     var awsIam = new IAM();
 
     awsIam.waitFor('userExists', {}, function(err, data) {
-        // if (err) {
-        //     console.log(err, err.stack); // an error occurred
-        // } else {
-        //     console.log(data);           // successful response
-        // }
         return (err ? false : true);
     });
 
@@ -197,9 +191,6 @@ function getDynamodbTableRecords(tableName) {
     var awsDocumentClient = new DynamoDB.DocumentClient({ convertEmptyValues: true });
 
     var params = { TableName: tableName, ReturnConsumedCapacity: 'TOTAL' };
-    // if (lastEvaluatedKey) {
-    //     params['ExclusiveStartKey'] = lastEvaluatedKey;
-    // }
 
     return new Promise((resolve, reject) => {
         awsDocumentClient.scan(params, function(err, data) {
@@ -234,166 +225,6 @@ function getDynamodbTableRecords(tableName) {
         });
     });
 }
-
-// function getDynamodbTableRecordsRecursive(tableName, lastEvaluatedKey = null, cntr = 0) {
-//     console.log("called getDynamodbTableRecordsRecursive(" + tableName + ", " + lastEvaluatedKey + ", " + cntr + ")");
-//     cntr++;
-
-//     getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey)
-//     .then(
-//         data => {
-//             console.log("then with cntr:" + cntr);
-//             console.log("data:" + data);
-//             if (data.LastEvaluatedKey || cntr <= 3) {
-//                 console.log("then more recurse");
-//                 console.log("then calling getDynamodbTableRecordsRecursive(" + tableName + ", " + data.LastEvaluatedKey + ", " + cntr+ ")");
-//                 return getDynamodbTableRecordsRecursive(tableName, data.LastEvaluatedKey, cntr)
-//                 .then(
-//                     nextData => {
-//                         console.log("then of then");
-//                         console.log("nextData:" + nextData);
-//                         data.Items = data.Items.concat(nextData.Items);
-//                     }
-//                 )
-//             }
-
-//             console.log("no more recurrse");
-//             console.log("data:" + data);
-//             return data
-//         }
-//     )
-// }
-
-// function callMyFunc(tableName, lastEvaluatedKey = null){
-//     return new Promise((resolve, reject)=>{
-//         console.log('getDynamodbTableRecordsRecursive','before wait');
-//         getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey).then(result=>{
-//             console.log("then with cntr:" + cntr);
-//             console.log("data:", data);
-
-//             if (data==null)
-//                 data=result;
-//             else if (result!=null){
-//                 data.Items= data.Items || [];
-//                 result.Items= result.Items || [];
-//                 data.Items = data.Items.push.call(data.Items,result.Items);
-//             }
-//         });
-//     });
-// }
-// async function getDynamodbTableRecordsRecursive(tableName, lastEvaluatedKey = null, cntr = 0) {
-//     console.log("called getDynamodbTableRecordsRecursive(" + tableName + ", " + lastEvaluatedKey + ", " + cntr + ")");
-//     cntr++;
-//     let data=null;
-
-
-
-
-
-//     for (let i=0;i<=3;i++){
-//         try{
-
-//             console.log('getDynamodbTableRecordsRecursive','before wait');
-//             nextData=await getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey);
-//             console.log("then with cntr:" + cntr);
-//             console.log("data:", data);
-
-//             if (data==null)
-//                 data=nextData;
-//             else if (nextData!=null){
-//                 data.Items= data.Items || [];
-//                 nextData.Items= nextData.Items || [];
-//                 data.Items = data.Items.push.call(data.Items,nextData.Items);
-//             }
-
-//         }
-//         catch(e){
-//             console.error('getDynamodbTableRecordsRecursive',e);
-//         }
-//     }
-
-
-//     // if (data && (data.LastEvaluatedKey || cntr <= 3)) {
-//     //     console.log("then more recurse");
-//     //     console.log("then calling getDynamodbTableRecordsRecursive(" + tableName + ", " + data.LastEvaluatedKey + ", " + cntr+ ")");
-//     //     return getDynamodbTableRecordsRecursive(tableName, data.LastEvaluatedKey, cntr)
-//     //     .then(
-//     //         nextData => {
-//     //             console.log("then of then");
-//     //             console.log("nextData:" + nextData);
-//     //             data.Items = data.Items.concat(nextData.Items);
-//     //         }
-//     //     )
-//     // }
-//     // console.log("no more recurrse");
-//     // console.log("data:" + data);
-//     return data
-//     // .then(
-//     //     data => {
-//     //         console.log("then with cntr:" + cntr);
-//     //         console.log("data:" + data);
-//     //         if (data.LastEvaluatedKey || cntr <= 3) {
-//     //             console.log("then more recurse");
-//     //             console.log("then calling getDynamodbTableRecordsRecursive(" + tableName + ", " + data.LastEvaluatedKey + ", " + cntr+ ")");
-//     //             return getDynamodbTableRecordsRecursive(tableName, data.LastEvaluatedKey, cntr)
-//     //             .then(
-//     //                 nextData => {
-//     //                     console.log("then of then");
-//     //                     console.log("nextData:" + nextData);
-//     //                     data.Items = data.Items.concat(nextData.Items);
-//     //                 }
-//     //             )
-//     //         }
-
-//     //         console.log("no more recurrse");
-//     //         console.log("data:" + data);
-//     //         return data
-//     //     }
-//     //)
-// }
-
-// function getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey = null) {
-//     var awsDocumentClient = new DynamoDB.DocumentClient({ convertEmptyValues: true });
-
-//     var params = { TableName: tableName, ReturnConsumedCapacity: 'TOTAL' };
-//     if (lastEvaluatedKey) {
-//         params['ExclusiveStartKey'] = lastEvaluatedKey;
-//     }
-
-//     return new Promise((resolve, reject) => {
-//         awsDocumentClient.scan(params, function(err, data) {
-//             if (err) {
-//                 console.log(err);
-//                 reject(err);
-//             }
-
-//             /*
-//             console.log(data);           // successful response
-//             data = {
-//                 "ConsumedCapacity": {
-//                     "CapacityUnits ": 0.5,
-//                     "TableName": "development_bv_order_data_history"
-//                 },
-//                 "Count": 1,
-//                 "Items": [
-//                     {
-//                         "buybackGuideId": {"N": "110331"},
-//                         "bvOrderId": {"N": "1393"},
-//                         "requestedQuantity": {"N": "1"},
-//                         "bidPrice": {"N": "1000"},
-//                         "details": {"S": "some shelf wear, may contain highlighting/notes"},
-//                         "buyerMarketId": {"N": "10648314344"},
-//                         "productId": {"N": "23365470"},
-//                         "buyerId": {"N": "273"}
-//                     }
-//                 ],
-//                 "ScannedCount": 1
-//             }
-//             */
-//             return resolve(data);
-//         });
-//     });
-// }
 
 function getConstantsForAwsService(namespace = 'iam') {
     var serviceConstants;
