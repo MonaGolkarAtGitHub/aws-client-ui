@@ -1,42 +1,70 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { userActions } from '../_actions';
+import {
+    AuthenticatedHeader,
+    LoadingSpinner,
+    NotFoundWrapper
+} from '../_components';
 
 class HomePage extends React.Component {
     componentDidMount() {
-//        this.props.getUsers();
+        this.props.getUserAccessibleServices(this.props.user);
     }
 
-    handleDeleteUser(id) {
-//        return (e) => this.props.deleteUser(id);
+    renderServices() {
+        const { loadingServicesSettings, accessibleServices } = this.props;
+
+        if (loadingServicesSettings) {
+            return <LoadingSpinner />
+        }
+
+        if (!accessibleServices) {
+            return <NotFoundWrapper message='No Accessible Services Found!' />
+        }
+
+        return (
+            <div className='list-group'>
+                {accessibleServices.map(awsService => (
+                    <Link
+                    key={awsService.namespace}
+                    to={`/${awsService.namespace}`}
+                    className={'list-group-item list-group-item-action align-middle' + (!awsService.accessible ? ' disabled ': '')}
+                    >
+                        {awsService.title}
+                    </Link>
+                ))}
+            </div>
+        )
     }
 
     render() {
         const { user } = this.props;
+
         return (
-            <div className="w-100">
-                <nav className="navbar navbar-expand-lg navbar-light bg-light w-100">
-                    <div className="d-flex align-items-center">
-                        <span className="font-weight-bold">Logged in as:</span> <span className="mx-2">{user.UserName}</span>
-                        <Link className="mx-4 btn btn-sm btn-secondary" to="/login" role="button">Logout</Link>
-                    </div>
-                </nav>
-                <div className="col-md-6 col-md-offset-3 pt-2 pb-5 my-2 bg-light w-100">
-                    <h3>AWS Services:</h3>
+            <div className='w-100'>
+                <AuthenticatedHeader loggedInUser={user} />
+                <div className='col-md-6 col-md-offset-3 pt-2 pb-5 my-2 bg-light w-100'>
+                    <h3 className='my-3'>AWS Services:</h3>
+                    {this.renderServices()}
                 </div>
             </div>
         );
     }
 }
 
-function mapState(state) {
-    const { authentication } = state;
+function mapStateToProps(state) {
+    const { authentication, userAccess } = state;
     const { user } = authentication;
-    return { user };
+    const { loadingServicesSettings, accessibleServices } = userAccess;
+
+    return { user, loadingServicesSettings, accessibleServices };
 }
 
-const actionCreators = {
+const mapActionsToProps = {
+    getUserAccessibleServices: userActions.getAccessibleServices
 }
 
-const connectedHomePage = connect(mapState, actionCreators)(HomePage);
+const connectedHomePage = connect(mapStateToProps, mapActionsToProps)(HomePage);
 export { connectedHomePage as HomePage };

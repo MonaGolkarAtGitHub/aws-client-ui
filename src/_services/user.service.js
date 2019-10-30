@@ -1,5 +1,6 @@
 import config from 'config';
 import { awsAccessService } from './';
+import { awsConstants } from '../_constants';
 
 export const userService = {
     login,
@@ -8,23 +9,15 @@ export const userService = {
 };
 
 function login(accessKey, secret) {
-    awsAccessService.setup(accessKey, secret)
+    awsAccessService.setup(accessKey, secret);
+
     return awsAccessService.getIamUser();
-/*    return new Promise((resolve, reject) => {
-        if (result.authenticated) {
-            const user = result.user;
-            // store user details and jwt token in local storage to keep user logged in between page refreshes
-            localStorage.setItem('user', JSON.stringify(user));
-
-            return resolve(user);
-        }
-
-        return reject(result.error);
-    }); */
 }
 
 function getUserAccessibleServices(user) {
-    return awsAccessService.getListGroupsForIAMUser(user.UserName);
+    var presentableAwsServices = awsConstants.SERVICES.filter(awsService => awsService.presentable).map((settings,index) => { return settings.namespace });
+
+    return awsAccessService.getListPoliciesGrantingServiceAccess(user.Arn, presentableAwsServices);
 }
 
 function logout() {

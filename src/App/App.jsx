@@ -7,6 +7,8 @@ import { alertActions } from '../_actions';
 import { PrivateRoute } from '../_components';
 import { HomePage } from '../HomePage';
 import { LoginPage } from '../LoginPage';
+import { AwsDynamodbPage } from '../AwsDynamodbPage';
+import { SqsPage } from '../AwsSqsPage';
 
 class App extends React.Component {
     constructor(props) {
@@ -31,6 +33,8 @@ class App extends React.Component {
                         <Router history={history}>
                             <div>
                                 <PrivateRoute exact path="/" component={HomePage} />
+                                <PrivateRoute path="/dynamodb" component={AwsDynamodbPage} />
+                                <PrivateRoute path="/sqs" component={SqsPage} />
                                 <Route path="/login" component={LoginPage} />
                             </div>
                         </Router>

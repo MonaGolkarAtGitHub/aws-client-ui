@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { userActions } from '../_actions';
@@ -30,8 +29,10 @@ class LoginPage extends React.Component {
         e.preventDefault();
 
         this.setState({ submitted: true });
+        const { loggedIn } = this.props;
         const { accessKey, secret } = this.state;
-        if (accessKey && secret) {
+
+        if (accessKey && secret && !loggedIn) {
             this.props.login(accessKey, secret);
         }
     }
@@ -40,27 +41,27 @@ class LoginPage extends React.Component {
         const { loggingIn } = this.props;
         const { accessKey, secret, submitted } = this.state;
         return (
-            <div className="col-md-4 offset-md-3">
+            <div className='col-md-4 offset-md-3'>
                 <h2>Login</h2>
-                <form name="form" onSubmit={this.handleSubmit}>
+                <form name='form' onSubmit={this.handleSubmit}>
                     <div className={'form-group' + (submitted && !accessKey ? ' has-error' : '')}>
-                        <label htmlFor="accessKey">Access Key ID</label>
-                        <input type="text" className="form-control" name="accessKey" value={accessKey} onChange={this.handleChange} />
+                        <label htmlFor='accessKey'>Access Key ID</label>
+                        <input type='text' className='form-control' name='accessKey' value={accessKey} onChange={this.handleChange} />
                         {submitted && !accessKey &&
-                            <div className="help-block">Access Key ID is required</div>
+                            <div className='help-block'>Access Key ID is required</div>
                         }
                     </div>
                     <div className={'form-group' + (submitted && !secret ? ' has-error' : '')}>
-                        <label htmlFor="secret">Secret Access Key</label>
-                        <input type="password" className="form-control" name="secret" value={secret} onChange={this.handleChange} />
+                        <label htmlFor='secret'>Secret Access Key</label>
+                        <input type='password' className='form-control' name='secret' value={secret} onChange={this.handleChange} />
                         {submitted && !secret &&
-                            <div className="help-block">Secret Access Key is required</div>
+                            <div className='help-block'>Secret Access Key is required</div>
                         }
                     </div>
-                    <div className="form-group">
-                        <button className="btn btn-primary">Login</button>
+                    <div className='form-group'>
+                        <button className='btn btn-primary'>Login</button>
                         {loggingIn &&
-                            <img src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                            <img src='data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==' />
                         }
                     </div>
                 </form>
@@ -69,15 +70,15 @@ class LoginPage extends React.Component {
     }
 }
 
-function mapState(state) {
-    const { loggingIn } = state.authentication;
-    return { loggingIn };
+function mapStateToProps(state) {
+    const { loggingIn, loggedIn } = state.authentication;
+    return { loggingIn, loggedIn };
 }
 
-const actionCreators = {
+const mapActionsToProps = {
     login: userActions.login,
     logout: userActions.logout
 };
 
-const connectedLoginPage = connect(mapState, actionCreators)(LoginPage);
+const connectedLoginPage = connect(mapStateToProps, mapActionsToProps)(LoginPage);
 export { connectedLoginPage as LoginPage };
