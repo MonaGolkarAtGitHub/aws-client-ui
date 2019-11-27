@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
 import { awsConstants } from '../_constants';
 import { AuthenticatedHeader } from '../_helpers'
 
-class SqsPage extends React.Component {
+class SqsPage extends Component {
     componentDidMount() {
 //        this.props.getUsers();
     }

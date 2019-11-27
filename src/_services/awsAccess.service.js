@@ -12,7 +12,7 @@ export const awsAccessService = {
     getDynamodbTablesList,
     getDynamodbTableDetails,
     getDynamodbTableRecords,
-  //  getDynamodbTableRecordsRecursive,
+    getDynamodbTableRecordsRecursive,
     getConstantsForAwsService,
     checkGlobalCredential
 };
@@ -196,7 +196,7 @@ function getDynamodbTableDetails(tableName) {
 function getDynamodbTableRecords(tableName) {
     var awsDocumentClient = new DynamoDB.DocumentClient({ convertEmptyValues: true });
 
-    var params = { TableName: tableName, ReturnConsumedCapacity: 'TOTAL' };
+    let params = { TableName: tableName, ReturnConsumedCapacity: 'TOTAL' };
     // if (lastEvaluatedKey) {
     //     params['ExclusiveStartKey'] = lastEvaluatedKey;
     // }
@@ -235,18 +235,163 @@ function getDynamodbTableRecords(tableName) {
     });
 }
 
+function getDynamodbTableRecordsRecursive(tableName, lastEvaluatedKey = null, result = { Items: [] }, cntr = 0) {
+    console.log("called getDynamodbTableRecordsRecursive(" + tableName + ", " + lastEvaluatedKey + ", " + cntr + ")");
+    cntr++;
+
+    return getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey)
+    .then(
+        data => {
+            console.log("then with cntr:" + cntr);
+            console.log("data:" + data);
+//            if (data.LastEvaluatedKey || cntr <= 3) {
+            if (data.LastEvaluatedKey || cntr <= 3) {
+                console.log("then more recurse");
+                console.log("then calling getDynamodbTableRecordsRecursive(" + tableName + ", " + data.LastEvaluatedKey + ", " + cntr+ ")");
+                return getDynamodbTableRecordsRecursive(
+                    tableName,
+                    data.LastEvaluatedKey,
+                    {
+                        ...data,
+                        Items: result.Items.concat(data.Items),
+                    },
+                    cntr
+                );
+            }
+
+            console.log("no more recurrse");
+            console.log("data:" + data);
+            return {
+                ...data,
+                Items: result.Items.concat(data.Items),
+            };
+        }
+    );
+}
+
+function getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey = null) {
+    var awsDocumentClient = new DynamoDB.DocumentClient({ convertEmptyValues: true });
+
+    var params = { TableName: tableName, ReturnConsumedCapacity: 'TOTAL' };
+    if (lastEvaluatedKey) {
+        params['ExclusiveStartKey'] = lastEvaluatedKey;
+    }
+
+    return new Promise((resolve, reject) => {
+        awsDocumentClient.scan(params, function(err, data) {
+            if (err) {
+                console.log(err);
+                reject(err);
+            }
+
+            /*
+            console.log(data);           // successful response
+            data = {
+                "ConsumedCapacity": {
+                    "CapacityUnits ": 0.5,
+                    "TableName": "development_bv_order_data_history"
+                },
+                "Count": 1,
+                "Items": [
+                    {
+                        "buybackGuideId": {"N": "110331"},
+                        "bvOrderId": {"N": "1393"},
+                        "requestedQuantity": {"N": "1"},
+                        "bidPrice": {"N": "1000"},
+                        "details": {"S": "some shelf wear, may contain highlighting/notes"},
+                        "buyerMarketId": {"N": "10648314344"},
+                        "productId": {"N": "23365470"},
+                        "buyerId": {"N": "273"}
+                    }
+                ],
+                "ScannedCount": 1
+            }
+            */
+            return resolve(data);
+        });
+    });
+}
+
 // function getDynamodbTableRecordsRecursive(tableName, lastEvaluatedKey = null, cntr = 0) {
 //     console.log("called getDynamodbTableRecordsRecursive(" + tableName + ", " + lastEvaluatedKey + ", " + cntr + ")");
 //     cntr++;
 
-//     getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey)
+//     var awsDocumentClient = new DynamoDB.DocumentClient({ convertEmptyValues: true });
+
+//     var params = { TableName: tableName, ReturnConsumedCapacity: 'TOTAL' };
+//     if (lastEvaluatedKey) {
+//         params['ExclusiveStartKey'] = lastEvaluatedKey;
+//     }
+
+//     awsDocumentClient.scan(params, function(err, data) {
+//         if (err) {
+//             console.log(err);
+//             throw err;
+//         }
+
+//         console.log("scan successfull #" + cntr);
+//         console.log("data:" + data);
+//         if (data.LastEvaluatedKey || cntr <= 3) {
+//             console.log("LastEvaluatedKey:" + data.LastEvaluatedKey);
+//             console.log("then recurse");
+//             console.log("then calling getDynamodbTableRecordsRecursive(" + tableName + ", " + data.LastEvaluatedKey + ", " + cntr+ ")");
+//             // var nextData = getDynamodbTableRecordsRecursive(tableName, data.LastEvaluatedKey, cntr)
+//             // console.log("nextData:" + nextData);
+//             // data.Items = data.Items.concat(nextData.Items);
+//             return getDynamodbTableRecordsRecursive(tableName, data.LastEvaluatedKey, cntr)
+//             .then(
+//                 nextData => {
+//                     console.log("then of then");
+//                     console.log("nextData:" + nextData);
+//                     data.Items = data.Items.concat(nextData.Items);
+//                 }
+//             )
+//         }
+//         console.log("no more recurrse");
+//         console.log("data:" + data);
+//         return data
+//     });
+// }
+
+// function getDynamodbTableRecordsRecursive(tableName, lastEvaluatedKey = null, cntr = 0) {
+//     console.log("called getDynamodbTableRecordsRecursive(" + tableName + ", " + lastEvaluatedKey + ", " + cntr + ")");
+//     cntr++;
+
+//     getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey, cntr)
 //     .then(
 //         data => {
 //             console.log("then with cntr:" + cntr);
 //             console.log("data:" + data);
+
+//             return data
+//         }
+//     )
+// }
+
+// function getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey = null, cntr = 0) {
+//     var awsDocumentClient = new DynamoDB.DocumentClient({ convertEmptyValues: true });
+
+//     var params = { TableName: tableName, ReturnConsumedCapacity: 'TOTAL' };
+//     if (lastEvaluatedKey) {
+//         params['ExclusiveStartKey'] = lastEvaluatedKey;
+//     }
+
+//     return new Promise((resolve, reject) => {
+//         awsDocumentClient.scan(params, function(err, data) {
+//             if (err) {
+//                 console.log(err);
+//                 reject(err);
+//             }
+
+//             console.log("scan successfull #" + cntr);
+//             console.log("data:" + data);
 //             if (data.LastEvaluatedKey || cntr <= 3) {
-//                 console.log("then more recurse");
+//                 console.log("LastEvaluatedKey:" + data.LastEvaluatedKey);
+//                 console.log("then recurse");
 //                 console.log("then calling getDynamodbTableRecordsRecursive(" + tableName + ", " + data.LastEvaluatedKey + ", " + cntr+ ")");
+//                 // var nextData = getDynamodbTableRecordsRecursive(tableName, data.LastEvaluatedKey, cntr)
+//                 // console.log("nextData:" + nextData);
+//                 // data.Items = data.Items.concat(nextData.Items);
 //                 return getDynamodbTableRecordsRecursive(tableName, data.LastEvaluatedKey, cntr)
 //                 .then(
 //                     nextData => {
@@ -256,12 +401,129 @@ function getDynamodbTableRecords(tableName) {
 //                     }
 //                 )
 //             }
-
 //             console.log("no more recurrse");
 //             console.log("data:" + data);
-//             return data
+
+//             return resolve(data);
+//         });
+//     });
+// }
+
+// function getDynamodbTableRecordsRecursive(tableName, lastEvaluatedKey = null, cntr = 0) {
+//     console.log("called getDynamodbTableRecordsRecursive(" + tableName + ", " + lastEvaluatedKey + ", " + cntr + ")");
+//     cntr++;
+
+//     var awsDocumentClient = new DynamoDB.DocumentClient({ convertEmptyValues: true });
+
+//     var params = { TableName: tableName, ReturnConsumedCapacity: 'TOTAL' };
+//     if (lastEvaluatedKey) {
+//         params['ExclusiveStartKey'] = lastEvaluatedKey;
+//     }
+
+//     awsDocumentClient.scan(params, function(err, data) {
+//         if (err) {
+//             console.log(err);
+//             throw err;
 //         }
-//     )
+
+//         console.log("scan successfull #" + cntr);
+//         console.log("data:" + data);
+//         if (data.LastEvaluatedKey || cntr <= 3) {
+//             console.log("LastEvaluatedKey:" + data.LastEvaluatedKey);
+//             console.log("then recurse");
+//             console.log("then calling getDynamodbTableRecordsRecursive(" + tableName + ", " + data.LastEvaluatedKey + ", " + cntr+ ")");
+//             // var nextData = getDynamodbTableRecordsRecursive(tableName, data.LastEvaluatedKey, cntr)
+//             // console.log("nextData:" + nextData);
+//             // data.Items = data.Items.concat(nextData.Items);
+//             return getDynamodbTableRecordsRecursive(tableName, data.LastEvaluatedKey, cntr)
+//             .then(
+//                 nextData => {
+//                     console.log("then of then");
+//                     console.log("nextData:" + nextData);
+//                     data.Items = data.Items.concat(nextData.Items);
+//                 }
+//             )
+//         }
+//         console.log("no more recurrse");
+//         console.log("data:" + data);
+//         return data
+//     });
+// }
+
+// function getDynamodbTableRecordsRecursive(tableName, lastEvaluatedKey = null, cntr = 0) {
+//     console.log("called getDynamodbTableRecordsRecursive(" + tableName + ", " + lastEvaluatedKey + ", " + cntr + ")");
+//     cntr++;
+
+//     return new Promise((resolve, reject) => {
+
+//         getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey)
+//         .then(
+//             data => {
+//                 console.log("then with cntr:" + cntr);
+//                 console.log("data:" + data);
+//     //            if (data.LastEvaluatedKey || cntr <= 3) {
+//                 if (data.LastEvaluatedKey || cntr <= 3) {
+//                     console.log("then more recurse");
+//                     console.log("then calling getDynamodbTableRecordsRecursive(" + tableName + ", " + data.LastEvaluatedKey + ", " + cntr+ ")");
+//                     return getDynamodbTableRecordsRecursive(tableName, data.LastEvaluatedKey, cntr)
+//                     .then(
+//                         nextData => {
+//                             console.log("then of then");
+//                             console.log("nextData:" + nextData);
+//                             data.Items = data.Items.concat(nextData.Items);
+//                         }
+//                     )
+//                 }
+
+//                 console.log("no more recurrse");
+//                 console.log("data:" + data);
+//                 return resolve(data);
+//             }
+//         );
+//     });
+// }
+
+// function getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey = null) {
+//     var awsDocumentClient = new DynamoDB.DocumentClient({ convertEmptyValues: true });
+
+//     var params = { TableName: tableName, ReturnConsumedCapacity: 'TOTAL' };
+//     if (lastEvaluatedKey) {
+//         params['ExclusiveStartKey'] = lastEvaluatedKey;
+//     }
+
+//     return new Promise((resolve, reject) => {
+//         awsDocumentClient.scan(params, function(err, data) {
+//             if (err) {
+//                 console.log(err);
+//                 reject(err);
+//             }
+
+//             /*
+//             console.log(data);           // successful response
+//             data = {
+//                 "ConsumedCapacity": {
+//                     "CapacityUnits ": 0.5,
+//                     "TableName": "development_bv_order_data_history"
+//                 },
+//                 "Count": 1,
+//                 "Items": [
+//                     {
+//                         "buybackGuideId": {"N": "110331"},
+//                         "bvOrderId": {"N": "1393"},
+//                         "requestedQuantity": {"N": "1"},
+//                         "bidPrice": {"N": "1000"},
+//                         "details": {"S": "some shelf wear, may contain highlighting/notes"},
+//                         "buyerMarketId": {"N": "10648314344"},
+//                         "productId": {"N": "23365470"},
+//                         "buyerId": {"N": "273"}
+//                     }
+//                 ],
+//                 "ScannedCount": 1
+//             }
+//             */
+//             return resolve(data);
+//         });
+//     });
 // }
 
 // function callMyFunc(tableName, lastEvaluatedKey = null){
@@ -352,48 +614,7 @@ function getDynamodbTableRecords(tableName) {
 //     //)
 // }
 
-// function getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey = null) {
-//     var awsDocumentClient = new DynamoDB.DocumentClient({ convertEmptyValues: true });
 
-//     var params = { TableName: tableName, ReturnConsumedCapacity: 'TOTAL' };
-//     if (lastEvaluatedKey) {
-//         params['ExclusiveStartKey'] = lastEvaluatedKey;
-//     }
-
-//     return new Promise((resolve, reject) => {
-//         awsDocumentClient.scan(params, function(err, data) {
-//             if (err) {
-//                 console.log(err);
-//                 reject(err);
-//             }
-
-//             /*
-//             console.log(data);           // successful response
-//             data = {
-//                 "ConsumedCapacity": {
-//                     "CapacityUnits ": 0.5,
-//                     "TableName": "development_bv_order_data_history"
-//                 },
-//                 "Count": 1,
-//                 "Items": [
-//                     {
-//                         "buybackGuideId": {"N": "110331"},
-//                         "bvOrderId": {"N": "1393"},
-//                         "requestedQuantity": {"N": "1"},
-//                         "bidPrice": {"N": "1000"},
-//                         "details": {"S": "some shelf wear, may contain highlighting/notes"},
-//                         "buyerMarketId": {"N": "10648314344"},
-//                         "productId": {"N": "23365470"},
-//                         "buyerId": {"N": "273"}
-//                     }
-//                 ],
-//                 "ScannedCount": 1
-//             }
-//             */
-//             return resolve(data);
-//         });
-//     });
-// }
 
 function getConstantsForAwsService(namespace = 'iam') {
     var serviceConstants;

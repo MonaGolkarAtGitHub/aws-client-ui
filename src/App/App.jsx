@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Router, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -10,7 +10,7 @@ import { LoginPage } from '../LoginPage';
 import { AwsDynamodbPage } from '../AwsDynamodbPage';
 import { SqsPage } from '../AwsSqsPage';
 
-class App extends React.Component {
+class App extends Component {
     constructor(props) {
         super(props);
 

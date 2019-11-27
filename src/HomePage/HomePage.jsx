@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { userActions } from '../_actions';
@@ -8,7 +8,7 @@ import {
     NotFoundWrapper
 } from '../_components';
 
-class HomePage extends React.Component {
+class HomePage extends Component {
     componentDidMount() {
         this.props.getUserAccessibleServices(this.props.user);
     }

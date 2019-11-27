@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { ListGroup, ListGroupItem, Badge, Button } from 'reactstrap';
 import { CSVLink } from 'react-csv';
@@ -10,7 +10,7 @@ import {
     NotFoundWrapper
 } from '../_components';
 
-class AwsDynamodbPage extends React.Component {
+class AwsDynamodbPage extends Component {
 
     componentWillMount() {
         this.props.getDynamodbTablesList();

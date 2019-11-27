@@ -55,14 +55,72 @@ function getDynamodbTableDetails(tableName) {
 }
 
 function getDynamodbTableRecords(tableName) {
-    return dispatch => {
+    return async dispatch => {
+    //return dispatch => {
         dispatch(request(tableName));
 
-        var headersSet = [];
-        var recordsSet = [];
-        var formattedRecordsSet = [];
+        let headersSet = [];
+        let recordsSet = [];
+        let formattedRecordsSet = [];
+
+        // awsAccessService.getDynamodbTableRecordsRecursive(tableName, null)
+        // .then(
+        //     data => {
+        //             data.Items.map(record => {
+        //                 headersSet = headersSet.concat((Object.keys(record)).filter(x => !headersSet.includes(x)));
+        //                 recordsSet.push(record);
+        //             });
+
+        //             recordsSet.map(record => {
+        //                 let formattedRecord = [];
+        //                 headersSet.map(column => {
+        //                     formattedRecord.push(record[column] === undefined ? '' : record[column]);
+        //                 });
+
+        //                 formattedRecordsSet.push(formattedRecord);
+        //             });
+
+        //             console.log(headersSet)
+        //             console.log(recordsSet)
+        //             console.log(formattedRecordsSet)
+        //             dispatch(success(formattedRecordsSet, headersSet));
+        //     },
+        //     error => {
+        //         console.log("No Records Found!")
+        //         dispatch(failure("No Records Found!"));
+        //         dispatch(alertActions.error("No Records Found!"));
+        //     }
+        // );
+
+        try {
+            var data = await awsAccessService.getDynamodbTableRecordsRecursive(tableName, null);
+            if (data.Items.length > 0) {
+                //no reason to have the temporary recordSet variable
+                data.Items.map(record => {
+                    headersSet = headersSet.concat((Object.keys(record)).filter(x => !headersSet.includes(x)));
+                    recordsSet.push(record);
+                });
+
+                recordsSet.map(record => {
+                    let formattedRecord = [];
+                    headersSet.map(column => {
+                        formattedRecord.push(record[column] === undefined ? '' : record[column]);
+                    });
+
+                    formattedRecordsSet.push(formattedRecord);
+                });
+
+                dispatch(success(data.Items.map(record => record)));
+            } else {
+                dispatch(failure('No Records Found!'));
+            }
+        } catch (e) {
+            dispatch(failure(e.message));
+        }
+
+
         // console.log("getDynamodbTableRecords calling getDynamodbTableRecordsRecursive");
-        // var data = await awsAccessService.getDynamodbTableRecordsRecursive(tableName) || {Items:[]};
+        // let data = awsAccessService.getDynamodbTableRecordsRecursive(tableName, null) || {Items:[]};
         // if (data.Items.length > 0){
         //     data.Items.map(record => {
         //         headersSet = headersSet.concat((Object.keys(record)).filter(x => !headersSet.includes(x)));
@@ -87,37 +145,39 @@ function getDynamodbTableRecords(tableName) {
         //     dispatch(failure("No Records Found!"));
         //     dispatch(alertActions.error("No Records Found!"));
         // }
-        awsAccessService.getDynamodbTableRecords(tableName)
-        // awsAccessService.getDynamodbTableRecordsRecursive(tableName)
-        .then(
-            data => {
-                console.log(data);
 
-                data.Items.map(record => {
-                    headersSet = headersSet.concat((Object.keys(record)).filter(x => !headersSet.includes(x)));
-                    recordsSet.push(record);
-                });
 
-                recordsSet.map(record => {
-                    let formattedRecord = [];
-                    headersSet.map(column => {
-                        formattedRecord.push(record[column] === undefined ? '' : record[column]);
-                    });
+        // awsAccessService.getDynamodbTableRecords(tableName)
+        // // awsAccessService.getDynamodbTableRecordsRecursive(tableName)
+        // .then(
+        //     data => {
+        //         console.log(data);
 
-                    formattedRecordsSet.push(formattedRecord);
-                });
+        //         data.Items.map(record => {
+        //             headersSet = headersSet.concat((Object.keys(record)).filter(x => !headersSet.includes(x)));
+        //             recordsSet.push(record);
+        //         });
 
-                console.log(headersSet)
-                console.log(recordsSet)
-                console.log(formattedRecordsSet)
-                dispatch(success(formattedRecordsSet, headersSet));
-            },
-            error => {
-                console.log(error.toString())
-                dispatch(failure(error.toString()));
-                dispatch(alertActions.error(error.toString()));
-            }
-        );
+        //         recordsSet.map(record => {
+        //             let formattedRecord = [];
+        //             headersSet.map(column => {
+        //                 formattedRecord.push(record[column] === undefined ? '' : record[column]);
+        //             });
+
+        //             formattedRecordsSet.push(formattedRecord);
+        //         });
+
+        //         console.log(headersSet)
+        //         console.log(recordsSet)
+        //         console.log(formattedRecordsSet)
+        //         dispatch(success(formattedRecordsSet, headersSet));
+        //     },
+        //     error => {
+        //         console.log(error.toString())
+        //         dispatch(failure(error.toString()));
+        //         dispatch(alertActions.error(error.toString()));
+        //     }
+        // );
     };
 
     function request(tableName) { return { type: awsConstants.DYNAMODB_TABLE_EXPORT_REQUEST, selectedTable: tableName } }

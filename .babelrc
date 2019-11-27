@@ -1,7 +1,13 @@
 {
-  "presets": [
-    "react",
-    "env",
-    "stage-0"
-  ]
+    "plugins":
+    [
+        "@babel/plugin-transform-runtime",
+        {
+            "regenerator": true
+        }
+    ],
+    "presets": [
+        "@babel/react",
+        "@babel/env"
+    ]
 }
