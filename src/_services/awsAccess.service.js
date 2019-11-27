@@ -82,10 +82,35 @@ function getDynamodbTableDetails(tableName) {
     });
 }
 
-function getDynamodbTableRecords(tableName) {
+function getDynamodbTableRecords(tableName, lastEvaluatedKey = null, result = { Items: [] }) {
+    return getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey)
+    .then(
+        data => {
+            if (data.LastEvaluatedKey) {
+                return getDynamodbTableRecords(
+                    tableName,
+                    data.LastEvaluatedKey,
+                    {
+                        ...data,
+                        Items: result.Items.concat(data.Items),
+                    }
+                );
+            }
+            return {
+                ...data,
+                Items: result.Items.concat(data.Items),
+            };
+        }
+    );
+}
+
+function getDynamodbTableRecordsBatch(tableName, lastEvaluatedKey = null) {
     var awsDocumentClient = new DynamoDB.DocumentClient({ convertEmptyValues: true });
 
     var params = { TableName: tableName, ReturnConsumedCapacity: 'TOTAL' };
+    if (lastEvaluatedKey) {
+        params['ExclusiveStartKey'] = lastEvaluatedKey;
+    }
 
     return new Promise((resolve, reject) => {
         awsDocumentClient.scan(params, function(err, data) {
