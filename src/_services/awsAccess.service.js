@@ -1,4 +1,3 @@
-import { useAsync } from "react-async";
 import AWS from 'aws-sdk/global';
 import IAM from 'aws-sdk/clients/iam';
 import DynamoDB from 'aws-sdk/clients/dynamodb';
@@ -12,8 +11,7 @@ export const awsAccessService = {
     getDynamodbTablesList,
     getDynamodbTableDetails,
     getDynamodbTableRecords,
-    getConstantsForAwsService,
-    checkGlobalCredential
+    getConstantsForAwsService
 };
 
 function setup(accessKey, secret) {
@@ -21,20 +19,11 @@ function setup(accessKey, secret) {
     AWS.config.update({
         region: awsAccessConfig.AWS_ACCESS_REGION,
         apiVersions:{
-            iam: awsAccessConfig.AWS_IAM_API_VERSION
+            iam: awsAccessConfig.AWS_IAM_API_VERSION,
+            dynamodb: awsAccessConfig.AWS_DYNAMODB_API_VERSION
         },
         credentials: awsCredentials
     });
-}
-
-function authenticateIamUser() {
-    var awsIam = new IAM();
-
-    awsIam.waitFor('userExists', {}, function(err, data) {
-        return (err ? false : true);
-    });
-
-    return false;
 }
 
 function getIamUser() {
@@ -46,18 +35,6 @@ function getIamUser() {
                 return reject(err);
             }
 
-            /*
-            console.log(data);           // successful response
-            data = {
-                User: {
-                    Arn: "arn:aws:iam::123456789012:user/Bob",
-                    CreateDate: <Date Representation>,
-                    Path: "/",
-                    UserId: "AKIAIOSFODNN7EXAMPLE",
-                    UserName: "Bob"
-                }
-            }
-            */
             return resolve(data.User);
         });
     });
@@ -72,40 +49,6 @@ function getListPoliciesGrantingServiceAccess(userArn, awsServiceNamespaces) {
                 return reject(err);
             }
 
-            /*
-            console.log(data);           // successful response
-            data = {
-                IsTruncated: false,
-                PoliciesGrantingServiceAccess: [
-                    {
-                        Policies: [
-                            {
-                                PolicyArn: "arn:aws:iam::123456789012:policy/ExampleIamPolicy",
-                                PolicyName: "ExampleIamPolicy",
-                                PolicyType: "MANAGED"
-                            },
-                            {
-                                EntityName: "AWSExampleGroup1",
-                                EntityType: "GROUP",
-                                PolicyName: "ExampleGroup1Policy",
-                                PolicyType: "INLINE"
-                            }
-                        ],
-                        ServiceNamespace: "iam"
-                    },
-                    {
-                        Policies: [
-                            {
-                                PolicyArn: "arn:aws:iam::123456789012:policy/ExampleEc2Policy",
-                                PolicyName: "ExampleEc2Policy",
-                                PolicyType: "MANAGED"
-                            }
-                        ],
-                        ServiceNamespace: "ec2"
-                    }
-                ]
-            }
-            */
             return resolve(data.PoliciesGrantingServiceAccess);
         });
     });
@@ -120,17 +63,6 @@ function getDynamodbTablesList() {
                 return reject(err);
             }
 
-            /*
-            console.log(data);           // successful response
-            data = {
-                TableNames: [
-                    "Forum",
-                    "ProductCatalog",
-                    "Reply",
-                    "Thread"
-                ]
-            }
-            */
             return resolve(data.TableNames);
         });
     });
@@ -145,43 +77,6 @@ function getDynamodbTableDetails(tableName) {
                 return reject(err);
             }
 
-            /*
-            console.log(data);           // successful response
-            data = {
-                Table: {
-                    AttributeDefinitions: [
-                        {
-                            AttributeName: "Artist",
-                            AttributeType: "S"
-                        },
-                        {
-                            AttributeName: "SongTitle",
-                            AttributeType: "S"
-                        }
-                    ],
-                    CreationDateTime: <Date Representation>,
-                    ItemCount: 0,
-                    KeySchema: [
-                        {
-                            AttributeName: "Artist",
-                            KeyType: "HASH"
-                        },
-                        {
-                            AttributeName: "SongTitle",
-                            KeyType: "RANGE"
-                        }
-                    ],
-                    ProvisionedThroughput: {
-                        NumberOfDecreasesToday: 1,
-                        ReadCapacityUnits: 5,
-                        WriteCapacityUnits: 5
-                    },
-                    TableName: "Music",
-                    TableSizeBytes: 0,
-                    TableStatus: "ACTIVE"
-                }
-            }
-            */
             return resolve(data.Table);
         });
     });
@@ -198,29 +93,6 @@ function getDynamodbTableRecords(tableName) {
                 return reject(err);
             }
 
-            /*
-            console.log(data);           // successful response
-            data = {
-                ConsumedCapacity: {
-                    TableName: "development_bv_order_data_history",
-                    CapacityUnits: 0.5
-                },
-                Count: 1,
-                Items: [
-                    {
-                        bidPrice: 1000
-                        buybackGuideId: 110331
-                        buyerId: 273
-                        buyerMarketId: 10648314344
-                        bvOrderId: 1393
-                        details: "Good Connecting readers with great books since 1972. Used books may not include companion materials, some shelf wear, may contain highlighting/notes, and may not include cd-rom or access codes. Customer service is our top priority!"
-                        productId: 23365470
-                        requestedQuantity: 1
-                    }
-                ],
-                ScannedCount: 1
-            }
-            */
             return resolve(data);
         });
     });
@@ -235,15 +107,4 @@ function getConstantsForAwsService(namespace = 'iam') {
     });
 
     return serviceConstants;
-}
-
-function checkGlobalCredential() {
-    AWS.config.getCredentials(function(err) {
-        if (err) console.log(err.stack);
-        // credentials not loaded
-        else {
-          console.log("Access key:", AWS.config.credentials.accessKeyId);
-          console.log("Secret access key:", AWS.config.credentials.secretAccessKey);
-        }
-    });
 }

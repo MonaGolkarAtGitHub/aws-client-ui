@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { userActions } from '../_actions';
 import {
     AuthenticatedHeader,
@@ -8,9 +8,12 @@ import {
     NotFoundWrapper
 } from '../_components';
 
-class HomePage extends React.Component {
+class HomePage extends Component {
     componentDidMount() {
-        this.props.getUserAccessibleServices(this.props.user);
+        const { user } = this.props;
+        if (user) {
+            this.props.getUserAccessibleServices(user);
+        }
     }
 
     renderServices() {
@@ -41,6 +44,10 @@ class HomePage extends React.Component {
 
     render() {
         const { user } = this.props;
+
+        if (!user) {
+            return <Redirect to='/login' />
+        }
 
         return (
             <div className='w-100'>

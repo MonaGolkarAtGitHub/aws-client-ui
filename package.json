@@ -14,7 +14,6 @@
     "aws-sdk": "^2.524.0",
     "history": "^4.6.3",
     "react": "^16.8.0",
-    "react-async": "^9.0.0",
     "react-csv": "^1.1.1",
     "react-dom": "^16.0.0",
     "react-redux": "^5.0.5",

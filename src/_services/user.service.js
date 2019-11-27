@@ -1,4 +1,3 @@
-import config from 'config';
 import { awsAccessService } from './';
 import { awsConstants } from '../_constants';
 

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { ListGroup, ListGroupItem, Badge, Button } from 'reactstrap';
+import { Redirect } from 'react-router-dom';
 import { CSVLink } from 'react-csv';
 
 import { awsActions, userActions } from '../_actions';
@@ -10,10 +11,12 @@ import {
     NotFoundWrapper
 } from '../_components';
 
-class AwsDynamodbPage extends React.Component {
+class AwsDynamodbPage extends Component {
 
-    componentWillMount() {
-        this.props.getDynamodbTablesList();
+    componentDidMount() {
+        if (this.props.user) {
+            this.props.getDynamodbTablesList();
+        }
     }
 
     renderTablesList() {
@@ -93,6 +96,10 @@ class AwsDynamodbPage extends React.Component {
 
     render() {
         const { user, tablesList } = this.props;
+
+        if (!user) {
+            return <Redirect to='/login' />
+        }
 
         return (
             <div className='w-100'>
