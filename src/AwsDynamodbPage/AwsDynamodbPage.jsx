@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { ListGroup, ListGroupItem, Badge, Button } from 'reactstrap';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import { CSVLink } from 'react-csv';
 
 import { awsActions, userActions } from '../_actions';
@@ -64,7 +64,7 @@ class AwsDynamodbPage extends Component {
                     </h5>
                     <div className='card-body'>
                         <h5 className='card-title'>Special title treatment</h5>
-                        <p className='card-text'>{JSON.stringify(tableDetails)}</p>
+                        <p className='card-text'>{JSON.stringify(tableDetails, null, 2)}</p>
                         {this.renderExportButton()}
                     </div>
                 </div>
@@ -105,6 +105,7 @@ class AwsDynamodbPage extends Component {
             <div className='w-100'>
                 <AuthenticatedHeader loggedInUser={user} />
                 <div className='col-md-12 col-md-offset-3 pt-2 pb-5 my-2 bg-light w-100'>
+                    <Link className="btn btn-sm btn-outline-secondary" to="/" role="button">Back</Link>
                     <h3 className='my-3'>
                         DynamoDB Tables <Badge color='info' className='mx-2'>{tablesList ? tablesList.length : '...'}</Badge>
                     </h3>
@@ -114,7 +115,7 @@ class AwsDynamodbPage extends Component {
                             {this.renderTablesList()}
                         </div>
                         <div className='col-sm-6'>
-                            {this.renderTableDetails()}
+                            <pre>{this.renderTableDetails()}</pre>
                         </div>
                     </div>
                 </div>
