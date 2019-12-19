@@ -53,15 +53,16 @@ function getDynamodbTableDetails(tableName) {
 }
 
 function getDynamodbTableRecords(tableName) {
-    return dispatch => {
+    return async dispatch => {
         dispatch(request(tableName));
 
-        var headersSet = [];
-        var recordsSet = [];
-        var formattedRecordsSet = [];
-        awsAccessService.getDynamodbTableRecords(tableName)
-        .then(
-            data => {
+        let headersSet = [];
+        let recordsSet = [];
+        let formattedRecordsSet = [];
+
+        try {
+            var data = await awsAccessService.getDynamodbTableRecords(tableName, null);
+            if (data.Items.length > 0) {
                 data.Items.map(record => {
                     headersSet = headersSet.concat((Object.keys(record)).filter(x => !headersSet.includes(x)));
                     recordsSet.push(record);
@@ -77,15 +78,15 @@ function getDynamodbTableRecords(tableName) {
                 });
 
                 dispatch(success(formattedRecordsSet, headersSet));
-            },
-            error => {
-                dispatch(failure(error.toString()));
-                dispatch(alertActions.error(error.toString()));
+            } else {
+                dispatch(failure('No Records Found!'));
             }
-        );
+        } catch (e) {
+            dispatch(failure(e.message));
+        }
     };
 
-    function request(tableName) { return { type: awsConstants.DYNAMODB_TABLE_EXPORT_REQUEST, selectedTable: tableName } }
-    function success(tableRecords, tableColumns) { return { type: awsConstants.DYNAMODB_TABLE_EXPORT_SUCCESS, tableRecords, tableColumns } }
-    function failure(error) { return { type: awsConstants.DYNAMODB_TABLE_EXPORT_FAILURE, errors: error } }
+    function request(tableName) { return { type: awsConstants.DYNAMODB_TABLE_EXPORT_REQUEST, selectedTable: tableName } }
+    function success(tableRecords, tableColumns) { return { type: awsConstants.DYNAMODB_TABLE_EXPORT_SUCCESS, tableRecords, tableColumns } }
+    function failure(error) { return { type: awsConstants.DYNAMODB_TABLE_EXPORT_FAILURE, errors: error } }
 }
