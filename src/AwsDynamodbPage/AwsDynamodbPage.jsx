@@ -20,7 +20,7 @@ class AwsDynamodbPage extends Component {
     }
 
     renderTablesList() {
-        const { loadingTablesList, tablesList, selectedTable } = this.props;
+        const { loadingTablesList, tablesList, selectedTable, getDynamodbTableDetails } = this.props;
 
         if (loadingTablesList) {
             return <LoadingSpinner />
@@ -33,7 +33,7 @@ class AwsDynamodbPage extends Component {
         return (
             <ListGroup id='tablesList'>
                 {tablesList.map((tableName, index) => (
-                    <ListGroupItem tag='button' key={'table' + index} className={tableName == selectedTable ? ' active' : ''} action onClick={() => this.props.getDynamodbTableDetails(tableName)}>
+                    <ListGroupItem tag='button' key={'table' + index} className={tableName == selectedTable ? ' active' : ''} action onClick={() => getDynamodbTableDetails(tableName)}>
                         {tableName}
                     </ListGroupItem>
                 ))}
