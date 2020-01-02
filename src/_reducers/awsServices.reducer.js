@@ -1,5 +1,4 @@
 import { awsConstants } from '../_constants';
-import { awsActions } from '../_actions';
 
 const initialState = {
     loadingTablesList: false,
